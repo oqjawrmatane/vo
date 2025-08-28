@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VEO Video Generator</title>
+  <style>
+    :root {
+      --background-color: #121212;
+      --surface-color: #1e1e1e;
+      --primary-color: #bb86fc;
+      --primary-variant-color: #3700b3;
+      --secondary-color: #03dac6;
+      --on-background-color: #e0e0e0;
+      --on-surface-color: #ffffff;
+      --error-color: #cf6679;
+      --border-radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--on-background-color);
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    #root {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding: 2rem;
+      background-color: var(--surface-color);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--on-surface-color);
+      font-size: 2.5rem;
+      font-weight: 600;
+      letter-spacing: -1px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    label {
+      font-weight: 500;
+      color: var(--on-background-color);
+    }
+
+    textarea, input {
+      background-color: var(--background-color);
+      color: var(--on-background-color);
+      border: 1px solid #444;
+      border-radius: var(--border-radius);
+      padding: 0.75rem;
+      font-size: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.25);
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: #000;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: #a764fa;
+    }
+    
+    .btn-primary:disabled {
+      background-color: #555;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--secondary-color);
+      border: 1px solid var(--secondary-color);
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(3, 218, 198, 0.1);
+    }
+
+    .file-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    input[type="file"] {
+      display: none;
+    }
+
+    .image-preview {
+      position: relative;
+    }
+
+    .image-preview img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: var(--border-radius);
+      border: 2px solid #444;
+    }
+    
+    .image-preview button {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: var(--error-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .segmented-control {
+      display: flex;
+      border: 1px solid #444;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+    }
+
+    .segmented-control button {
+      flex: 1;
+      padding: 0.5rem;
+      background-color: transparent;
+      border: none;
+      color: var(--on-background-color);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .segmented-control button.active {
+      background-color: var(--primary-color);
+      color: #000;
+      font-weight: 600;
+    }
+    
+    .switch-control {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input { display: none; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #444;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--secondary-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    
+    .output-section, .loading-section {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background-color: var(--background-color);
+      border-radius: var(--border-radius);
+      text-align: center;
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(255, 255, 255, 0.2);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-section p {
+      color: var(--on-background-color);
+      font-style: italic;
+    }
+
+    .output-section video {
+      width: 100%;
+      max-width: 100%;
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      background-color: #000;
+    }
+    
+    .error-message {
+      color: var(--error-color);
+      background-color: rgba(207, 102, 121, 0.1);
+      border: 1px solid var(--error-color);
+      padding: 0.75rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+    }
+    
+    .disclaimer {
+      font-size: 0.8rem;
+      color: #888;
+      text-align: center;
+      margin-top: -1rem;
+    }
+
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
